@@ -9,7 +9,29 @@ A Kali Linux virtual machine will be used only to generate controlled and benign
 The environment is designed to demonstrate the complete security monitoring lifecycle:
 
 **Telemetry → Collection → SIEM → Detection → Alert → Triage → Investigation → Correlation → Response → Remediation → Validation → Documentation**
+flowchart LR
 
+    HOST["Physical Host<br/>Windows 11 + VMware Workstation"]
+
+    INTERNET["Internet<br/>Temporary NAT Access"]
+
+    subgraph LAB["VMware Host-Only Lab Network — 192.168.50.0/24"]
+
+        SPLUNK["SOC-SPLUNK01<br/>Ubuntu Server 24.04 LTS<br/>192.168.50.10<br/><br/>Splunk Enterprise"]
+
+        WIN["SOC-WIN01<br/>Windows 11<br/>192.168.50.20<br/><br/>Windows Event Logs<br/>Sysmon<br/>Splunk Universal Forwarder"]
+
+        KALI["SOC-KALI01<br/>Kali Linux<br/>192.168.50.30<br/><br/>Controlled Security Testing"]
+
+    end
+
+    WIN -->|"Windows + Sysmon Telemetry<br/>TCP 9997"| SPLUNK
+    KALI -->|"Controlled Test Traffic"| WIN
+    HOST -->|"Splunk Web<br/>TCP 8000"| SPLUNK
+
+    INTERNET -. "Temporary updates/downloads only" .-> SPLUNK
+    INTERNET -. "Temporary updates/downloads only" .-> WIN
+    INTERNET -. "Temporary updates/downloads only" .-> KALI
 ---
 
 ## Architecture Components
