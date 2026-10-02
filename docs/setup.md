@@ -40,3 +40,28 @@ The dedicated `VMnet2` Host-Only network was successfully created with DHCP disa
 Evidence:
 
 `images/02-vmware-isolated-network.png`
+## Splunk Server Virtual Machine
+
+The Splunk Enterprise server virtual machine was created in VMware Workstation Pro.
+
+### Virtual Machine Configuration
+
+- VM Name: `SOC-SPLUNK01`
+- Operating System: Ubuntu Server 24.04 LTS
+- Memory: 8 GB
+- vCPU: 4
+- Virtual Disk: 100 GB
+- Initial Network Adapter: NAT
+- VM Storage Location: `C:\VMs\SOC-SPLUNK01`
+
+NAT connectivity is being used temporarily during operating system installation and trusted software updates.
+
+The dedicated VMware Host-Only network (`VMnet2`) will be added after the operating system has been installed and validated.
+
+### Validation
+
+The VM hardware configuration was reviewed before operating system installation.
+
+Evidence:
+
+`images/04-splunk-vm-hardware.png`
