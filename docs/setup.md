@@ -5,7 +5,7 @@ This document records the deployment and configuration of the SOC/SIEM lab envir
 Configuration steps will be documented as each component is deployed and validated.
 
 ## Current Status
-
+**Phase 0 — Planning and Architecture**
 ## VMware Network Configuration
 
 A dedicated VMware Host-Only network was created for the SOC lab.
