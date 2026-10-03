@@ -111,3 +111,39 @@ The results confirm that the physical host can securely administer `SOC-SPLUNK01
 Evidence:
 
 `images/07-host-to-splunk-lab-connectivity.png`
+## Splunk Enterprise Deployment
+
+Splunk Enterprise was installed on `SOC-SPLUNK01` using the official Linux AMD64 Debian package.
+
+### Installation
+
+- Splunk Enterprise Version: `10.6.0.5`
+- Installation Directory: `/opt/splunk`
+- Operating System: Ubuntu Server 24.04.5 LTS
+- Splunk OS Service Account: `splunk`
+- Splunk Web Port: `8000`
+- Lab Interface: `192.168.50.10`
+
+The downloaded Splunk package was validated against Splunk's published SHA-512 checksum before installation.
+
+Splunk was started using the dedicated `splunk` operating-system account rather than root.
+
+### Splunk Web Validation
+
+Splunk Web was successfully accessed from the Windows host across the isolated VMware Host-Only network at:
+
+`http://192.168.50.10:8000`
+
+Successful access confirmed that:
+
+- Splunk Enterprise started successfully
+- Splunk Web is listening on TCP port `8000`
+- The Windows host can reach Splunk through `VMnet2`
+- Administrator authentication is functioning
+
+Evidence:
+
+- `images/08-splunk-package-checksum-verification.png`
+- `images/09-splunk-install-validation.png`
+- `images/10-splunk-first-start.png`
+- `images/11-splunk-web-home.png`
