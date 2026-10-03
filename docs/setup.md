@@ -306,3 +306,20 @@ All four telemetry categories generated events successfully in the `Microsoft-Wi
 Evidence:
 
 `images/27-sysmon-telemetry-validation.png`
+## Sysmon Ingestion Validation
+
+Sysmon telemetry from `SOC-WIN01` was successfully forwarded to `SOC-SPLUNK01` through the Splunk Universal Forwarder.
+
+### Data Path
+
+- Source: `SOC-WIN01`
+- Event Log: `Microsoft-Windows-Sysmon/Operational`
+- Forwarder: Splunk Universal Forwarder
+- Receiver: `192.168.50.10:9997`
+- Destination Index: `sysmon`
+
+Splunk successfully indexed Sysmon telemetry from the monitored Windows endpoint.
+
+Evidence:
+
+`images/31-sysmon-ingestion-validation.png`
