@@ -187,3 +187,19 @@ This receiver will be used by `SOC-WIN01` when the monitored Windows endpoint is
 Evidence:
 
 `images/13-splunk-receiving-port-9997.png`
+## Splunk Security Indexes
+
+Dedicated indexes were created to separate Windows operating-system events from Sysmon endpoint telemetry.
+
+### Indexes
+
+| Index | Purpose |
+|---|---|
+| `windows` | Windows Security, System, and Application event logs |
+| `sysmon` | Microsoft Sysmon operational telemetry |
+
+Both indexes were successfully created and are active.
+
+Evidence:
+
+`images/14-splunk-security-indexes.png`
