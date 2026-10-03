@@ -323,3 +323,21 @@ Splunk successfully indexed Sysmon telemetry from the monitored Windows endpoint
 Evidence:
 
 `images/31-sysmon-ingestion-validation.png`
+## Sysmon Event ID Validation
+
+Sysmon telemetry was validated after ingestion into Splunk.
+
+The following security-relevant event types were successfully observed:
+
+| Event ID | Activity |
+|---|---|
+| `1` | Process creation |
+| `3` | Network connection |
+| `11` | File creation |
+| `22` | DNS query |
+
+Additional registry and process events were also observed.
+
+Evidence:
+
+`images/32-sysmon-event-id-validation.png`
