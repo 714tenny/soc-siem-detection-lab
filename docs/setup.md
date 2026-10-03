@@ -288,3 +288,21 @@ Connectivity from `SOC-WIN01` to the Splunk receiver was successfully tested:
 Evidence:
 
 `images/23-windows-network-validation.png`
+## Sysmon Telemetry Validation
+
+Sysmon was configured on `SOC-WIN01` and validated using controlled test activity.
+
+### Validated Event Types
+
+| Event ID | Telemetry |
+|---|---|
+| `1` | Process creation |
+| `3` | Network connections |
+| `11` | File creation |
+| `22` | DNS queries |
+
+All four telemetry categories generated events successfully in the `Microsoft-Windows-Sysmon/Operational` event log.
+
+Evidence:
+
+`images/27-sysmon-telemetry-validation.png`
