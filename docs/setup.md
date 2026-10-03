@@ -203,3 +203,31 @@ Both indexes were successfully created and are active.
 Evidence:
 
 `images/14-splunk-security-indexes.png`
+## Splunk Server Firewall Hardening
+
+Ubuntu UFW was enabled to restrict access to services running on `SOC-SPLUNK01`.
+
+### Firewall Rules
+
+| Port | Service | Allowed Source |
+|---|---|---|
+| `22/TCP` | SSH | `192.168.50.1` |
+| `8000/TCP` | Splunk Web | `192.168.50.1` |
+| `9997/TCP` | Splunk Forwarder Receiver | `192.168.50.20` |
+
+Splunk management port `8089/TCP` is not exposed to other systems in the lab.
+
+All inbound access is restricted to the isolated `VMnet2` interface (`ens37`).
+
+### Validation
+
+Connectivity testing from the Windows host confirmed:
+
+- SSH (`22/TCP`) — reachable
+- Splunk Web (`8000/TCP`) — reachable
+- Splunk management (`8089/TCP`) — blocked
+
+Evidence:
+
+- `images/15-splunk-firewall-rules.png`
+- `images/16-splunk-firewall-validation.png`
