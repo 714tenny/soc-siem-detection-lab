@@ -147,3 +147,28 @@ Evidence:
 - `images/09-splunk-install-validation.png`
 - `images/10-splunk-first-start.png`
 - `images/11-splunk-web-home.png`
+## Splunk Automatic Startup
+
+Splunk Enterprise was configured as a systemd-managed service using the dedicated `splunk` operating-system account.
+
+### Service Configuration
+
+- Service: `Splunkd.service`
+- Service User: `splunk`
+- Service Group: `splunk`
+- Boot Startup: Enabled
+- Service State: Active
+
+The Ubuntu server was rebooted to verify that Splunk Enterprise starts automatically without manual intervention.
+
+### Post-Reboot Validation
+
+The following checks succeeded:
+
+- `systemctl is-enabled Splunkd` returned `enabled`
+- `systemctl is-active Splunkd` returned `active`
+- Splunk CLI confirmed `splunkd is running`
+
+Evidence:
+
+`images/12-splunk-boot-start-validation.png`
