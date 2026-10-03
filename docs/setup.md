@@ -93,3 +93,21 @@ Both interfaces were successfully activated and the routing table confirmed that
 Evidence:
 
 `images/06-splunk-server-network-validation.png`
+## Host-to-Splunk Connectivity Validation
+
+Connectivity between the Windows host and the Splunk server was validated across the isolated VMware Host-Only network.
+
+### Validation Results
+
+- Windows host VMnet2 address: `192.168.50.1`
+- Splunk server lab address: `192.168.50.10`
+- ICMP connectivity: Successful
+- Packet loss: 0%
+- SSH TCP port 22: Reachable
+- VMware interface: `VMware Network Adapter VMnet2`
+
+The results confirm that the physical host can securely administer `SOC-SPLUNK01` through the isolated SOC lab network.
+
+Evidence:
+
+`images/07-host-to-splunk-lab-connectivity.png`
