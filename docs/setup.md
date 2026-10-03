@@ -172,3 +172,18 @@ The following checks succeeded:
 Evidence:
 
 `images/12-splunk-boot-start-validation.png`
+## Splunk Forwarder Receiving Port
+
+Splunk Enterprise was configured to receive forwarded security telemetry on TCP port `9997`.
+
+### Configuration
+
+- Receiving Port: `9997/TCP`
+- Status: Enabled
+- Purpose: Receive Windows Event Log and Sysmon telemetry from the Splunk Universal Forwarder
+
+This receiver will be used by `SOC-WIN01` when the monitored Windows endpoint is deployed.
+
+Evidence:
+
+`images/13-splunk-receiving-port-9997.png`
