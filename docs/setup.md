@@ -257,3 +257,34 @@ The VM hardware configuration was reviewed before operating system installation.
 Evidence:
 
 `images/18-windows-vm-hardware.png`
+## Windows Endpoint Network Configuration
+
+`SOC-WIN01` was configured with two network interfaces to separate trusted Internet access from isolated SOC lab traffic.
+
+### NAT Interface
+
+- Interface: `Ethernet0`
+- Address: `192.168.225.129/24`
+- Purpose: Temporary Internet access for Windows updates and trusted software downloads
+
+### SOC Lab Interface
+
+- Interface: `Ethernet1`
+- Address: `192.168.50.20/24`
+- Network: `VMnet2`
+- Default Gateway: None
+- Purpose: Security telemetry and communication with `SOC-SPLUNK01`
+
+### Splunk Connectivity Validation
+
+Connectivity from `SOC-WIN01` to the Splunk receiver was successfully tested:
+
+- Destination: `192.168.50.10`
+- TCP Port: `9997`
+- Source Interface: `Ethernet1`
+- Source Address: `192.168.50.20`
+- Result: Successful
+
+Evidence:
+
+`images/23-windows-network-validation.png`
