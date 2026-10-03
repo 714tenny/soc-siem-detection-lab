@@ -231,3 +231,29 @@ Evidence:
 
 - `images/15-splunk-firewall-rules.png`
 - `images/16-splunk-firewall-validation.png`
+## Windows Endpoint Virtual Machine
+
+The monitored Windows endpoint virtual machine was created in VMware Workstation Pro.
+
+### Virtual Machine Configuration
+
+- VM Name: `SOC-WIN01`
+- Operating System: Windows 11 Pro
+- Memory: 8 GB
+- vCPU: 4
+- Virtual Disk: 80 GB
+- Initial Network Adapter: NAT
+- Virtual TPM: Enabled
+- VM Storage Location: `C:\VMs\SOC-WIN01`
+
+NAT connectivity will be used temporarily during Windows installation and trusted software updates.
+
+The isolated `VMnet2` interface will be added after Windows installation and validation.
+
+### Validation
+
+The VM hardware configuration was reviewed before operating system installation.
+
+Evidence:
+
+`images/18-windows-vm-hardware.png`
