@@ -65,3 +65,31 @@ The VM hardware configuration was reviewed before operating system installation.
 Evidence:
 
 `images/04-splunk-vm-hardware.png`
+## Splunk Server Network Configuration
+
+The Splunk server uses two network interfaces to separate trusted Internet access from isolated SOC lab traffic.
+
+### NAT Interface
+
+- Interface: `ens33`
+- Address: `192.168.225.128/24`
+- Purpose: Temporary Internet access for trusted updates and official software downloads
+- Default route: VMware NAT through `192.168.225.2`
+
+### SOC Lab Interface
+
+- Interface: `ens37`
+- Address: `192.168.50.10/24`
+- Purpose: Permanent communication with systems inside the isolated SOC lab
+- Network: `VMnet2`
+- Default Gateway: None
+
+The isolated interface does not provide an Internet route. Traffic for the lab subnet remains on `192.168.50.0/24`.
+
+### Validation
+
+Both interfaces were successfully activated and the routing table confirmed that the NAT interface remains the default Internet route.
+
+Evidence:
+
+`images/06-splunk-server-network-validation.png`
