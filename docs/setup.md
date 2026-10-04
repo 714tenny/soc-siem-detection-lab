@@ -356,5 +356,22 @@ Splunk successfully detected:
 The test value was removed immediately after validation.
 
 Evidence:
+## Sysmon Search-Time Field Extraction
 
+A custom Splunk technical add-on named `TA-soc-lab-sysmon` was created to extract useful Sysmon fields at search time.
+
+Validated fields include:
+
+- `EventCode`
+- `User`
+- `Image`
+- `CommandLine`
+- `ParentImage`
+- `ParentCommandLine`
+
+This allows Sysmon telemetry to be searched directly without requiring manual `rex` commands.
+
+Evidence:
+
+`images/38-sysmon-field-extraction-validation.png`
 `images/35-sysmon-registry-persistence-validation.png`
