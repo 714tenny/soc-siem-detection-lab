@@ -169,7 +169,7 @@ Further tuning could include trusted applications, approved registry values, or 
 
 | Technique | ID |
 |---|---|
-| Registry Run Keys / Startup Folder | `T1060` |
+| Registry Run Keys / Startup Folder | `T1547.001` |
 
 This technique represents persistence through registry locations that execute programs during user logon.
 
