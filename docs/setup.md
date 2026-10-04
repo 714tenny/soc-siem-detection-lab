@@ -341,3 +341,20 @@ Additional registry and process events were also observed.
 Evidence:
 
 `images/32-sysmon-event-id-validation.png`
+## Sysmon Registry Tuning Validation
+
+Sysmon registry monitoring was tuned to reduce high-volume background activity while preserving visibility into security-relevant persistence locations.
+
+A controlled test value named `SOC-Lab-Test` was created under the Windows `CurrentVersion\Run` registry key and immediately removed.
+
+Splunk successfully detected:
+
+- Sysmon Event ID `13` — registry value modification
+- Sysmon Event ID `12` — registry object/value deletion
+- The monitored `CurrentVersion\Run` persistence path
+
+The test value was removed immediately after validation.
+
+Evidence:
+
+`images/35-sysmon-registry-persistence-validation.png`
