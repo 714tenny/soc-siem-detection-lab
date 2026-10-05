@@ -1,0 +1,26 @@
+<Sysmon schemaversion="4.91">
+  <HashAlgorithms>SHA256</HashAlgorithms>
+  <CheckRevocation>true</CheckRevocation>
+  <DnsLookup>true</DnsLookup>
+
+  <EventFiltering>
+    <ProcessCreate onmatch="exclude" />
+    <NetworkConnect onmatch="exclude" />
+    <FileCreate onmatch="exclude" />
+
+    <RegistryEvent onmatch="include">
+      <TargetObject condition="contains">\Software\Microsoft\Windows\CurrentVersion\Run</TargetObject>
+      <TargetObject condition="contains">\Software\Microsoft\Windows\CurrentVersion\RunOnce</TargetObject>
+      <TargetObject condition="contains">\System\CurrentControlSet\Services\</TargetObject>
+      <TargetObject condition="contains">\Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\</TargetObject>
+      <TargetObject condition="contains">\Software\Microsoft\Windows NT\CurrentVersion\Winlogon</TargetObject>
+      <TargetObject condition="contains">\Software\Microsoft\Windows Defender\Exclusions\</TargetObject>
+      <TargetObject condition="contains">\Software\Policies\Microsoft\Windows Defender\</TargetObject>
+      <TargetObject condition="contains">\Software\Microsoft\Windows\CurrentVersion\Policies\System</TargetObject>
+    </RegistryEvent>
+
+    <WmiEvent onmatch="exclude" />
+    <DnsQuery onmatch="exclude" />
+    <ProcessTampering onmatch="exclude" />
+  </EventFiltering>
+</Sysmon>
