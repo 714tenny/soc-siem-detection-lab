@@ -10,6 +10,18 @@ The project includes custom field extraction, detection tuning, scheduled alerts
 
 All simulated activity is benign and performed only against systems owned and controlled within an isolated lab environment.
 
+
+## Project Navigation
+
+- [Architecture](docs/architecture.md)
+- [Lab Setup & Validation](docs/setup.md)
+- [Detection Engineering Summary](docs/detections.md)
+- [Detection Index](detections/README.md)
+- [Incident Response Workflow](docs/incident-response.md)
+- [Controlled PowerShell Incident Investigation](incidents/01-controlled-powershell-incident.md)
+- [Configuration Artifacts](scripts/README.md)
+- [Lessons Learned](docs/lessons-learned.md)
+
 ---
 
 ## Skills Demonstrated
