@@ -1,377 +1,385 @@
 # Lab Setup
 
-This document records the deployment and configuration of the SOC/SIEM lab environment.
+## Overview
 
-Configuration steps will be documented as each component is deployed and validated.
+This document records the completed deployment and validation of the SOC/SIEM home lab.
 
 ## Current Status
-**Phase 0 — Planning and Architecture**
+
+**Complete**
+
+The final environment includes:
+
+- SOC-SPLUNK01 — Ubuntu Server 24.04.5 LTS running Splunk Enterprise 10.6.0.5
+- SOC-WIN01 — Windows 11 Pro monitored with Sysmon and Splunk Universal Forwarder
+- VMnet2 isolated lab network — 192.168.50.0/24
+- Dedicated windows and sysmon indexes
+- Custom search-time field extraction
+- Five validated detections and scheduled alerts
+- SOC Security Monitoring Dashboard
+- Controlled incident investigation
+
 ## VMware Network Configuration
 
-A dedicated VMware Host-Only network was created for the SOC lab.
+A dedicated VMware host-only network was created for lab communication.
 
 ### Lab Network
 
-- Network: `VMnet2`
-- Network Type: Host-only
-- Subnet: `192.168.50.0/24`
-- Subnet Mask: `255.255.255.0`
-- Host Virtual Adapter: Enabled
+- Network: VMnet2
+- Network type: Host-only / isolated lab network
+- Subnet: 192.168.50.0/24
+- Subnet mask: 255.255.255.0
+- Host virtual adapter: Enabled
+- Host VMnet2 address: 192.168.50.1
 - VMware DHCP: Disabled
 
-Static IP addresses will be assigned manually to each lab system:
+Static lab addresses:
 
-| System | Planned IP Address |
+| System | IP Address |
 |---|---|
 | SOC-SPLUNK01 | 192.168.50.10 |
 | SOC-WIN01 | 192.168.50.20 |
-| SOC-KALI01 | 192.168.50.30 |
 
-The Host-Only network isolates controlled security testing from the public Internet and physical home network.
-
-VMware NAT (`VMnet8`) will only be used temporarily when a virtual machine requires trusted Internet access for operating system updates or official software downloads.
-
-Bridged networking will not be used for security simulations.
-
-### Validation
-
-The dedicated `VMnet2` Host-Only network was successfully created with DHCP disabled and the host virtual adapter enabled.
+Both virtual machines also retain VMware NAT adapters for trusted updates and official software downloads.
 
 Evidence:
 
-`images/02-vmware-isolated-network.png`
-## Splunk Server Virtual Machine
+![VMware Isolated Network](../images/02-vmware-isolated-network.png)
 
-The Splunk Enterprise server virtual machine was created in VMware Workstation Pro.
+## SOC-SPLUNK01 Virtual Machine
 
 ### Virtual Machine Configuration
 
-- VM Name: `SOC-SPLUNK01`
-- Operating System: Ubuntu Server 24.04 LTS
+- VM name: SOC-SPLUNK01
+- Operating system: Ubuntu Server 24.04.5 LTS
 - Memory: 8 GB
 - vCPU: 4
-- Virtual Disk: 100 GB
-- Initial Network Adapter: NAT
-- VM Storage Location: `C:\VMs\SOC-SPLUNK01`
-
-NAT connectivity is being used temporarily during operating system installation and trusted software updates.
-
-The dedicated VMware Host-Only network (`VMnet2`) will be added after the operating system has been installed and validated.
-
-### Validation
-
-The VM hardware configuration was reviewed before operating system installation.
+- Virtual disk: 100 GB
+- Storage location: C:\VMs\SOC-SPLUNK01
 
 Evidence:
 
-`images/04-splunk-vm-hardware.png`
-## Splunk Server Network Configuration
+![Splunk VM Hardware](../images/04-splunk-vm-hardware.png)
 
-The Splunk server uses two network interfaces to separate trusted Internet access from isolated SOC lab traffic.
+## SOC-SPLUNK01 Network Configuration
 
 ### NAT Interface
 
-- Interface: `ens33`
-- Address: `192.168.225.128/24`
-- Purpose: Temporary Internet access for trusted updates and official software downloads
-- Default route: VMware NAT through `192.168.225.2`
+- Interface: ens33
+- Address observed during deployment: 192.168.225.128/24
+- Purpose: trusted Internet access
+- Default route: VMware NAT
 
-### SOC Lab Interface
+### Lab Interface
 
-- Interface: `ens37`
-- Address: `192.168.50.10/24`
-- Purpose: Permanent communication with systems inside the isolated SOC lab
-- Network: `VMnet2`
-- Default Gateway: None
+- Interface: ens37
+- Address: 192.168.50.10/24
+- Network: VMnet2
+- Default gateway: none
 
-The isolated interface does not provide an Internet route. Traffic for the lab subnet remains on `192.168.50.0/24`.
-
-### Validation
-
-Both interfaces were successfully activated and the routing table confirmed that the NAT interface remains the default Internet route.
+The lab interface carries management and telemetry traffic without providing a default Internet route.
 
 Evidence:
 
-`images/06-splunk-server-network-validation.png`
-## Host-to-Splunk Connectivity Validation
+![Splunk Network Validation](../images/06-splunk-server-network-validation.png)
 
-Connectivity between the Windows host and the Splunk server was validated across the isolated VMware Host-Only network.
+## Host-to-Splunk Connectivity
 
-### Validation Results
+The Windows physical host was validated against SOC-SPLUNK01 over VMnet2.
 
-- Windows host VMnet2 address: `192.168.50.1`
-- Splunk server lab address: `192.168.50.10`
-- ICMP connectivity: Successful
-- Packet loss: 0%
-- SSH TCP port 22: Reachable
-- VMware interface: `VMware Network Adapter VMnet2`
-
-The results confirm that the physical host can securely administer `SOC-SPLUNK01` through the isolated SOC lab network.
+- Host VMnet2 address: 192.168.50.1
+- Splunk lab address: 192.168.50.10
+- ICMP: successful
+- SSH TCP 22: reachable
+- Splunk Web TCP 8000: reachable
 
 Evidence:
 
-`images/07-host-to-splunk-lab-connectivity.png`
+![Host to Splunk Connectivity](../images/07-host-to-splunk-lab-connectivity.png)
+
 ## Splunk Enterprise Deployment
 
-Splunk Enterprise was installed on `SOC-SPLUNK01` using the official Linux AMD64 Debian package.
+Splunk Enterprise was installed from the official Linux AMD64 Debian package.
 
-### Installation
+### Installation Details
 
-- Splunk Enterprise Version: `10.6.0.5`
-- Installation Directory: `/opt/splunk`
-- Operating System: Ubuntu Server 24.04.5 LTS
-- Splunk OS Service Account: `splunk`
-- Splunk Web Port: `8000`
-- Lab Interface: `192.168.50.10`
+- Version: 10.6.0.5
+- Installation directory: /opt/splunk
+- Service account: splunk
+- Splunk Web: TCP 8000
+- Forwarder receiver: TCP 9997
 
-The downloaded Splunk package was validated against Splunk's published SHA-512 checksum before installation.
-
-Splunk was started using the dedicated `splunk` operating-system account rather than root.
-
-### Splunk Web Validation
-
-Splunk Web was successfully accessed from the Windows host across the isolated VMware Host-Only network at:
-
-`http://192.168.50.10:8000`
-
-Successful access confirmed that:
-
-- Splunk Enterprise started successfully
-- Splunk Web is listening on TCP port `8000`
-- The Windows host can reach Splunk through `VMnet2`
-- Administrator authentication is functioning
+The downloaded package was verified against the published SHA-512 checksum before installation.
 
 Evidence:
 
-- `images/08-splunk-package-checksum-verification.png`
-- `images/09-splunk-install-validation.png`
-- `images/10-splunk-first-start.png`
-- `images/11-splunk-web-home.png`
+- [Package checksum verification](../images/08-splunk-package-checksum-verification.png)
+- [Splunk installation validation](../images/09-splunk-install-validation.png)
+- [Splunk first start](../images/10-splunk-first-start.png)
+- [Splunk Web home](../images/11-splunk-web-home.png)
+
 ## Splunk Automatic Startup
 
-Splunk Enterprise was configured as a systemd-managed service using the dedicated `splunk` operating-system account.
+Splunk was configured as a systemd-managed service using the dedicated splunk account.
 
-### Service Configuration
+Validation confirmed:
 
-- Service: `Splunkd.service`
-- Service User: `splunk`
-- Service Group: `splunk`
-- Boot Startup: Enabled
-- Service State: Active
-
-The Ubuntu server was rebooted to verify that Splunk Enterprise starts automatically without manual intervention.
-
-### Post-Reboot Validation
-
-The following checks succeeded:
-
-- `systemctl is-enabled Splunkd` returned `enabled`
-- `systemctl is-active Splunkd` returned `active`
-- Splunk CLI confirmed `splunkd is running`
+- Splunkd enabled at boot
+- Splunkd active after reboot
+- Splunk CLI confirmed the service was running
 
 Evidence:
 
-`images/12-splunk-boot-start-validation.png`
-## Splunk Forwarder Receiving Port
+![Splunk Boot Start](../images/12-splunk-boot-start-validation.png)
 
-Splunk Enterprise was configured to receive forwarded security telemetry on TCP port `9997`.
+## Splunk Receiving Port
 
-### Configuration
-
-- Receiving Port: `9997/TCP`
-- Status: Enabled
-- Purpose: Receive Windows Event Log and Sysmon telemetry from the Splunk Universal Forwarder
-
-This receiver will be used by `SOC-WIN01` when the monitored Windows endpoint is deployed.
+Splunk Enterprise was configured to receive forwarder data on TCP 9997.
 
 Evidence:
 
-`images/13-splunk-receiving-port-9997.png`
+![Splunk Receiving Port](../images/13-splunk-receiving-port-9997.png)
+
 ## Splunk Security Indexes
 
-Dedicated indexes were created to separate Windows operating-system events from Sysmon endpoint telemetry.
-
-### Indexes
+Dedicated indexes separate standard Windows logs from Sysmon telemetry.
 
 | Index | Purpose |
 |---|---|
-| `windows` | Windows Security, System, and Application event logs |
-| `sysmon` | Microsoft Sysmon operational telemetry |
-
-Both indexes were successfully created and are active.
+| windows | Windows Security, System, and Application logs |
+| sysmon | Microsoft Sysmon Operational telemetry |
 
 Evidence:
 
-`images/14-splunk-security-indexes.png`
+![Splunk Security Indexes](../images/14-splunk-security-indexes.png)
+
 ## Splunk Server Firewall Hardening
 
-Ubuntu UFW was enabled to restrict access to services running on `SOC-SPLUNK01`.
-
-### Firewall Rules
+Ubuntu UFW was enabled with source-restricted access on the isolated interface.
 
 | Port | Service | Allowed Source |
 |---|---|---|
-| `22/TCP` | SSH | `192.168.50.1` |
-| `8000/TCP` | Splunk Web | `192.168.50.1` |
-| `9997/TCP` | Splunk Forwarder Receiver | `192.168.50.20` |
+| 22/TCP | SSH | 192.168.50.1 |
+| 8000/TCP | Splunk Web | 192.168.50.1 |
+| 9997/TCP | Splunk Forwarder receiver | 192.168.50.20 |
 
-Splunk management port `8089/TCP` is not exposed to other systems in the lab.
-
-All inbound access is restricted to the isolated `VMnet2` interface (`ens37`).
-
-### Validation
-
-Connectivity testing from the Windows host confirmed:
-
-- SSH (`22/TCP`) — reachable
-- Splunk Web (`8000/TCP`) — reachable
-- Splunk management (`8089/TCP`) — blocked
+TCP 8089 is not exposed to other systems in the lab.
 
 Evidence:
 
-- `images/15-splunk-firewall-rules.png`
-- `images/16-splunk-firewall-validation.png`
-## Windows Endpoint Virtual Machine
+- [Splunk Firewall Rules](../images/15-splunk-firewall-rules.png)
+- [Splunk Firewall Validation](../images/16-splunk-firewall-validation.png)
 
-The monitored Windows endpoint virtual machine was created in VMware Workstation Pro.
+## SOC-WIN01 Virtual Machine
 
 ### Virtual Machine Configuration
 
-- VM Name: `SOC-WIN01`
-- Operating System: Windows 11 Pro
+- VM name: SOC-WIN01
+- Operating system: Windows 11 Pro
 - Memory: 8 GB
 - vCPU: 4
-- Virtual Disk: 80 GB
-- Initial Network Adapter: NAT
-- Virtual TPM: Enabled
-- VM Storage Location: `C:\VMs\SOC-WIN01`
-
-NAT connectivity will be used temporarily during Windows installation and trusted software updates.
-
-The isolated `VMnet2` interface will be added after Windows installation and validation.
-
-### Validation
-
-The VM hardware configuration was reviewed before operating system installation.
+- Virtual disk: 80 GB
+- Virtual TPM: enabled
+- Storage location: C:\VMs\SOC-WIN01
 
 Evidence:
 
-`images/18-windows-vm-hardware.png`
-## Windows Endpoint Network Configuration
+![Windows VM Hardware](../images/18-windows-vm-hardware.png)
 
-`SOC-WIN01` was configured with two network interfaces to separate trusted Internet access from isolated SOC lab traffic.
+## Windows Installation and VMware Tools
+
+Windows 11 Pro was installed and updated. VMware Tools was installed and validated.
+
+Evidence:
+
+- [Windows installation complete](../images/19-windows-installation-complete.png)
+- [Windows system validation](../images/20-windows-system-validation.png)
+- [Windows update validation](../images/21-windows-update-validation.png)
+- [VMware Tools validation](../images/22-vmware-tools-validation.png)
+
+## SOC-WIN01 Network Configuration
+
+SOC-WIN01 uses two adapters.
 
 ### NAT Interface
 
-- Interface: `Ethernet0`
-- Address: `192.168.225.129/24`
-- Purpose: Temporary Internet access for Windows updates and trusted software downloads
+- Interface: Ethernet0
+- Purpose: trusted Internet access
 
-### SOC Lab Interface
+### Lab Interface
 
-- Interface: `Ethernet1`
-- Address: `192.168.50.20/24`
-- Network: `VMnet2`
-- Default Gateway: None
-- Purpose: Security telemetry and communication with `SOC-SPLUNK01`
+- Interface: Ethernet1
+- Address: 192.168.50.20/24
+- Network: VMnet2
+- Default gateway: none
 
-### Splunk Connectivity Validation
-
-Connectivity from `SOC-WIN01` to the Splunk receiver was successfully tested:
-
-- Destination: `192.168.50.10`
-- TCP Port: `9997`
-- Source Interface: `Ethernet1`
-- Source Address: `192.168.50.20`
-- Result: Successful
+Connectivity from SOC-WIN01 to SOC-SPLUNK01 TCP 9997 was validated successfully.
 
 Evidence:
 
-`images/23-windows-network-validation.png`
+![Windows Network Validation](../images/23-windows-network-validation.png)
+
+## Sysmon Deployment
+
+Sysmon 15.22 was downloaded from Microsoft, its Authenticode signature was validated, and Sysmon64 was installed as a Windows service.
+
+Evidence:
+
+- [Sysmon Signature Verification](../images/24-sysmon-signature-verification.png)
+- [Sysmon Installation Validation](../images/25-sysmon-install-validation.png)
+- [Sysmon Configuration Validation](../images/26-sysmon-configuration-validation.png)
+
 ## Sysmon Telemetry Validation
 
-Sysmon was configured on `SOC-WIN01` and validated using controlled test activity.
-
-### Validated Event Types
-
-| Event ID | Telemetry |
-|---|---|
-| `1` | Process creation |
-| `3` | Network connections |
-| `11` | File creation |
-| `22` | DNS queries |
-
-All four telemetry categories generated events successfully in the `Microsoft-Windows-Sysmon/Operational` event log.
-
-Evidence:
-
-`images/27-sysmon-telemetry-validation.png`
-## Sysmon Ingestion Validation
-
-Sysmon telemetry from `SOC-WIN01` was successfully forwarded to `SOC-SPLUNK01` through the Splunk Universal Forwarder.
-
-### Data Path
-
-- Source: `SOC-WIN01`
-- Event Log: `Microsoft-Windows-Sysmon/Operational`
-- Forwarder: Splunk Universal Forwarder
-- Receiver: `192.168.50.10:9997`
-- Destination Index: `sysmon`
-
-Splunk successfully indexed Sysmon telemetry from the monitored Windows endpoint.
-
-Evidence:
-
-`images/31-sysmon-ingestion-validation.png`
-## Sysmon Event ID Validation
-
-Sysmon telemetry was validated after ingestion into Splunk.
-
-The following security-relevant event types were successfully observed:
+Controlled tests validated:
 
 | Event ID | Activity |
 |---|---|
-| `1` | Process creation |
-| `3` | Network connection |
-| `11` | File creation |
-| `22` | DNS query |
-
-Additional registry and process events were also observed.
+| 1 | Process creation |
+| 3 | Network connection |
+| 11 | File creation |
+| 22 | DNS query |
 
 Evidence:
 
-`images/32-sysmon-event-id-validation.png`
-## Sysmon Registry Tuning Validation
+![Sysmon Telemetry Validation](../images/27-sysmon-telemetry-validation.png)
 
-Sysmon registry monitoring was tuned to reduce high-volume background activity while preserving visibility into security-relevant persistence locations.
+## Splunk Universal Forwarder
 
-A controlled test value named `SOC-Lab-Test` was created under the Windows `CurrentVersion\Run` registry key and immediately removed.
+The official Splunk Universal Forwarder 10.6.0.5 Windows MSI was verified and installed on SOC-WIN01.
 
-Splunk successfully detected:
+The forwarder sends data to:
 
-- Sysmon Event ID `13` — registry value modification
-- Sysmon Event ID `12` — registry object/value deletion
-- The monitored `CurrentVersion\Run` persistence path
+**192.168.50.10:9997**
 
-The test value was removed immediately after validation.
+Monitored logs:
+
+- Application
+- System
+- Security
+- Microsoft-Windows-Sysmon/Operational
+
+Destination indexes:
+
+- windows
+- sysmon
 
 Evidence:
+
+- [Forwarder checksum verification](../images/28-splunk-forwarder-checksum-verification.png)
+- [Forwarder connection validation](../images/29-splunk-forwarder-connection-validation.png)
+- [Windows log ingestion validation](../images/30-windows-log-ingestion-validation.png)
+- [Sysmon ingestion validation](../images/31-sysmon-ingestion-validation.png)
+
+## Sysmon Event ID Validation
+
+Splunk successfully received the expected Sysmon event types.
+
+Evidence:
+
+![Sysmon Event ID Validation](../images/32-sysmon-event-id-validation.png)
+
+## Sysmon Registry Tuning
+
+Initial registry telemetry was excessively noisy, with Event IDs 12 and 13 dominating results.
+
+The Sysmon configuration was tuned to retain security-relevant registry locations such as:
+
+- Run
+- RunOnce
+- Services
+- Image File Execution Options
+- Winlogon
+- Windows Defender exclusions and policies
+- Windows policies related to system configuration
+
+A controlled Run-key test verified that persistence telemetry remained visible after tuning.
+
+Evidence:
+
+- [Tuned Sysmon Configuration](../images/33-sysmon-tuned-configuration.png)
+- [Noise Reduction Validation](../images/34-sysmon-noise-reduction-validation.png)
+- [Registry Persistence Validation](../images/35-sysmon-registry-persistence-validation.png)
+
 ## Sysmon Search-Time Field Extraction
 
-A custom Splunk technical add-on named `TA-soc-lab-sysmon` was created to extract useful Sysmon fields at search time.
+The Sysmon sourcetype is:
 
-Validated fields include:
+**XmlWinEventLog:Microsoft-Windows-Sysmon/Operational**
 
-- `EventCode`
-- `User`
-- `Image`
-- `CommandLine`
-- `ParentImage`
-- `ParentCommandLine`
+A custom Splunk technical add-on named **TA-soc-lab-sysmon** was created to extract fields such as:
 
-This allows Sysmon telemetry to be searched directly without requiring manual `rex` commands.
+- EventCode
+- User
+- Image
+- CommandLine
+- ParentImage
+- ParentCommandLine
+- TargetFilename
+- TargetObject
+- DestinationIp
+- DestinationPort
+
+The add-on is exported at system scope so the fields are available in Search & Reporting.
 
 Evidence:
 
-`images/38-sysmon-field-extraction-validation.png`
-`images/35-sysmon-registry-persistence-validation.png`
+- [Sysmon Sourcetype Validation](../images/36-sysmon-sourcetype-validation.png)
+- [EventCode Field Extraction](../images/37-sysmon-eventcode-field-extraction.png)
+- [Sysmon Field Extraction Validation](../images/38-sysmon-field-extraction-validation.png)
+
+## Windows Security Field Extraction
+
+The same custom add-on was extended to the Windows Security sourcetype:
+
+**XmlWinEventLog:Security**
+
+This enabled direct searching of:
+
+- EventCode
+- TargetUserName
+- IpAddress
+- WorkstationName
+- LogonType
+- Status
+- SubStatus
+
+Evidence:
+
+![Windows Security Field Extraction](../images/51-windows-security-field-extraction-validation.png)
+
+## Detection and Alert Validation
+
+Five security detections were baselined, tuned, tested, and converted into scheduled Splunk alerts.
+
+See:
+
+[Detection Engineering](detections.md)
+
+## SOC Dashboard
+
+A Splunk Dashboard Studio dashboard was created with endpoint, authentication, network, event-volume, and detection views.
+
+Evidence:
+
+![SOC Security Monitoring Dashboard](../images/54-soc-security-monitoring-dashboard.png)
+
+## Controlled Incident Investigation
+
+A controlled PowerShell incident was used to validate alert triage, Sysmon ProcessGuid correlation, registry analysis, network analysis, child-process investigation, timeline reconstruction, and cleanup.
+
+See:
+
+[Incident Response](incident-response.md)
+
+[Full Incident Investigation](../incidents/01-controlled-powershell-incident.md)
+
+## Final Validation
+
+The lab now provides an end-to-end defensive workflow:
+
+**Windows telemetry → Splunk forwarding → indexing → field extraction → detection → scheduled alert → dashboard → investigation → remediation → documentation**
+
+## Current Status
+
+**Complete**
