@@ -266,7 +266,7 @@ Destination indexes:
 
 Evidence:
 
-- [Forwarder checksum verification](../images/28-splunk-forwarder-checksum-verification.png)
+- [Forwarder checksum verification](../images/28-splunk-forwarder-package-verification.png)
 - [Forwarder connection validation](../images/29-splunk-forwarder-connection-validation.png)
 - [Windows log ingestion validation](../images/30-windows-log-ingestion-validation.png)
 - [Sysmon ingestion validation](../images/31-sysmon-ingestion-validation.png)
